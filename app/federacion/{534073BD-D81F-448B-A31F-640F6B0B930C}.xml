@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<configuration date="2016/04/14" author="e.World Technology Ltd.">
+<project id="{534073BD-D81F-448B-A31F-640F6B0B930C}" file="E:\wamp\www\federacion\pmp\federacion.pmp" name="federacion" product="PHPMaker" version="12.0" datetime="2016/04/14 16:59:55" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
+<table id="departamento" name="departamento" caption="Departamento" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+<table id="deporte" name="deporte" caption="Deporte" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+<table id="federacion_tipo" name="federacion_tipo" caption="Tipo de Federación" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+<table id="municipio" name="municipio" caption="Municipio" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+<table id="organo_tipo" name="organo_tipo" caption="Tipo de Órgano" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+<table id="pais" name="pais" caption="País" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+<table id="audittrail" name="audittrail" caption="audittrail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1"/>
+</project></configuration>
