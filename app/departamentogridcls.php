@@ -100,7 +100,7 @@ class cdepartamento_grid extends cdepartamento {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message
@@ -320,9 +320,6 @@ class cdepartamento_grid extends cdepartamento {
 		// Create Token
 		$this->CreateToken();
 
-		// Set up master detail parameters
-		$this->SetUpMasterParms();
-
 		// Setup other options
 		$this->SetupOtherOptions();
 	}
@@ -350,11 +347,6 @@ class cdepartamento_grid extends cdepartamento {
 				exit();
 			}
 		}
-
-//		$GLOBALS["Table"] = &$GLOBALS["MasterTable"];
-		unset($GLOBALS["Grid"]);
-		if ($url == "")
-			return;
 		$this->Page_Redirecting($url);
 
 		// Go to URL if specified
@@ -463,28 +455,8 @@ class cdepartamento_grid extends cdepartamento {
 
 		// Build filter
 		$sFilter = "";
-
-		// Restore master/detail filter
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Restore detail filter
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
-
-		// Load master record
-		if ($this->CurrentMode <> "add" && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "pais") {
-			global $pais;
-			$rsmaster = $pais->LoadRs($this->DbMasterFilter);
-			$this->MasterRecordExists = ($rsmaster && !$rsmaster->EOF);
-			if (!$this->MasterRecordExists) {
-				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record found
-				$this->Page_Terminate("paislist.php"); // Return to master page
-			} else {
-				$pais->LoadListRowValues($rsmaster);
-				$pais->RowType = EW_ROWTYPE_MASTER; // Master row
-				$pais->RenderListRow();
-				$rsmaster->Close();
-			}
-		}
 
 		// Set up filter in session
 		$this->setSessionWhere($sFilter);
@@ -850,14 +822,6 @@ class cdepartamento_grid extends cdepartamento {
 
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
-
-			// Reset master/detail keys
-			if ($this->Command == "resetall") {
-				$this->setCurrentMasterTable(""); // Clear master table
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-				$this->idpais->setSessionValue("");
-			}
 
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
@@ -1277,33 +1241,6 @@ class cdepartamento_grid extends cdepartamento {
 			// idpais
 			$this->idpais->EditAttrs["class"] = "form-control";
 			$this->idpais->EditCustomAttributes = "";
-			if ($this->idpais->getSessionValue() <> "") {
-				$this->idpais->CurrentValue = $this->idpais->getSessionValue();
-				$this->idpais->OldValue = $this->idpais->CurrentValue;
-			if (strval($this->idpais->CurrentValue) <> "") {
-				$sFilterWrk = "`idpais`" . ew_SearchString("=", $this->idpais->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `idpais`, `nombre` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pais`";
-			$sWhereWrk = "";
-			$lookuptblfilter = "`estado` = 'Activo'";
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->idpais, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$sSqlWrk .= " ORDER BY `idpais`";
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->idpais->ViewValue = $this->idpais->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->idpais->ViewValue = $this->idpais->CurrentValue;
-				}
-			} else {
-				$this->idpais->ViewValue = NULL;
-			}
-			$this->idpais->ViewCustomAttributes = "";
-			} else {
 			if (trim(strval($this->idpais->CurrentValue)) == "") {
 				$sFilterWrk = "0=1";
 			} else {
@@ -1322,7 +1259,6 @@ class cdepartamento_grid extends cdepartamento {
 			if ($rswrk) $rswrk->Close();
 			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
 			$this->idpais->EditValue = $arwrk;
-			}
 
 			// Add refer script
 			// nombre
@@ -1354,33 +1290,6 @@ class cdepartamento_grid extends cdepartamento {
 			// idpais
 			$this->idpais->EditAttrs["class"] = "form-control";
 			$this->idpais->EditCustomAttributes = "";
-			if ($this->idpais->getSessionValue() <> "") {
-				$this->idpais->CurrentValue = $this->idpais->getSessionValue();
-				$this->idpais->OldValue = $this->idpais->CurrentValue;
-			if (strval($this->idpais->CurrentValue) <> "") {
-				$sFilterWrk = "`idpais`" . ew_SearchString("=", $this->idpais->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `idpais`, `nombre` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pais`";
-			$sWhereWrk = "";
-			$lookuptblfilter = "`estado` = 'Activo'";
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->idpais, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$sSqlWrk .= " ORDER BY `idpais`";
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->idpais->ViewValue = $this->idpais->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->idpais->ViewValue = $this->idpais->CurrentValue;
-				}
-			} else {
-				$this->idpais->ViewValue = NULL;
-			}
-			$this->idpais->ViewCustomAttributes = "";
-			} else {
 			if (trim(strval($this->idpais->CurrentValue)) == "") {
 				$sFilterWrk = "0=1";
 			} else {
@@ -1399,7 +1308,6 @@ class cdepartamento_grid extends cdepartamento {
 			if ($rswrk) $rswrk->Close();
 			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
 			$this->idpais->EditValue = $arwrk;
-			}
 
 			// Edit refer script
 			// nombre
@@ -1591,9 +1499,6 @@ class cdepartamento_grid extends cdepartamento {
 		global $Language, $Security;
 
 		// Set up foreign key field value from Session
-			if ($this->getCurrentMasterTable() == "pais") {
-				$this->idpais->CurrentValue = $this->idpais->getSessionValue();
-			}
 		$conn = &$this->Connection();
 
 		// Load db values from rsold
@@ -1643,19 +1548,6 @@ class cdepartamento_grid extends cdepartamento {
 			$this->Row_Inserted($rs, $rsnew);
 		}
 		return $AddRow;
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-
-		// Hide foreign keys
-		$sMasterTblVar = $this->getCurrentMasterTable();
-		if ($sMasterTblVar == "pais") {
-			$this->idpais->Visible = FALSE;
-			if ($GLOBALS["pais"]->EventCancelled) $this->EventCancelled = TRUE;
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
 	}
 
 	// Page Load event

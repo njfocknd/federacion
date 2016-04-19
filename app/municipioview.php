@@ -133,7 +133,7 @@ class cmunicipio_view extends cmunicipio {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message

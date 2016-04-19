@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql12.php") ?>
 <?php include_once "phpfn12.php" ?>
 <?php include_once "federacion_tipoinfo.php" ?>
+<?php include_once "federaciongridcls.php" ?>
 <?php include_once "userfn12.php" ?>
 <?php
 
@@ -100,7 +101,7 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message
@@ -279,6 +280,14 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
+
+			// Process auto fill for detail table 'federacion'
+			if (@$_POST["grid"] == "ffederaciongrid") {
+				if (!isset($GLOBALS["federacion_grid"])) $GLOBALS["federacion_grid"] = new cfederacion_grid;
+				$GLOBALS["federacion_grid"]->Page_Init();
+				$this->Page_Terminate();
+				exit();
+			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -377,6 +386,9 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
 
+		// Set up detail parameters
+		$this->SetUpDetailParms();
+
 		// Validate form if post back
 		if (@$_POST["a_add"] <> "") {
 			if (!$this->ValidateForm()) {
@@ -399,13 +411,19 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
 					$this->Page_Terminate("federacion_tipolist.php"); // No matching record, return to list
 				}
+
+				// Set up detail parameters
+				$this->SetUpDetailParms();
 				break;
 			case "A": // Add new record
 				$this->SendEmail = TRUE; // Send email on add success
 				if ($this->AddRow($this->OldRecordset)) { // Add successful
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
-					$sReturnUrl = $this->getReturnUrl();
+					if ($this->getCurrentDetailTable() <> "") // Master/detail add
+						$sReturnUrl = $this->GetDetailUrl();
+					else
+						$sReturnUrl = $this->getReturnUrl();
 					if (ew_GetPageName($sReturnUrl) == "federacion_tipolist.php")
 						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 					elseif (ew_GetPageName($sReturnUrl) == "federacion_tipoview.php")
@@ -414,6 +432,9 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 				} else {
 					$this->EventCancelled = TRUE; // Event cancelled
 					$this->RestoreFormValues(); // Add failed, restore form values
+
+					// Set up detail parameters
+					$this->SetUpDetailParms();
 				}
 		}
 
@@ -632,6 +653,13 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->siglas->FldCaption(), $this->siglas->ReqErrMsg));
 		}
 
+		// Validate detail grid
+		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
+		if (in_array("federacion", $DetailTblVar) && $GLOBALS["federacion"]->DetailAdd) {
+			if (!isset($GLOBALS["federacion_grid"])) $GLOBALS["federacion_grid"] = new cfederacion_grid(); // get detail page object
+			$GLOBALS["federacion_grid"]->ValidateGridForm();
+		}
+
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
 
@@ -659,6 +687,10 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 			}
 		}
 		$conn = &$this->Connection();
+
+		// Begin transaction
+		if ($this->getCurrentDetailTable() <> "")
+			$conn->BeginTrans();
 
 		// Load db values from rsold
 		if ($rsold) {
@@ -697,6 +729,27 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 			}
 			$AddRow = FALSE;
 		}
+
+		// Add detail records
+		if ($AddRow) {
+			$DetailTblVar = explode(",", $this->getCurrentDetailTable());
+			if (in_array("federacion", $DetailTblVar) && $GLOBALS["federacion"]->DetailAdd) {
+				$GLOBALS["federacion"]->idfederacion_tipo->setSessionValue($this->idfederacion_tipo->CurrentValue); // Set master key
+				if (!isset($GLOBALS["federacion_grid"])) $GLOBALS["federacion_grid"] = new cfederacion_grid(); // Get detail page object
+				$AddRow = $GLOBALS["federacion_grid"]->GridInsert();
+				if (!$AddRow)
+					$GLOBALS["federacion"]->idfederacion_tipo->setSessionValue(""); // Clear master key if insert failed
+			}
+		}
+
+		// Commit/Rollback transaction
+		if ($this->getCurrentDetailTable() <> "") {
+			if ($AddRow) {
+				$conn->CommitTrans(); // Commit transaction
+			} else {
+				$conn->RollbackTrans(); // Rollback transaction
+			}
+		}
 		if ($AddRow) {
 
 			// Call Row Inserted event
@@ -704,6 +757,39 @@ class cfederacion_tipo_add extends cfederacion_tipo {
 			$this->Row_Inserted($rs, $rsnew);
 		}
 		return $AddRow;
+	}
+
+	// Set up detail parms based on QueryString
+	function SetUpDetailParms() {
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
+			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
+			$this->setCurrentDetailTable($sDetailTblVar);
+		} else {
+			$sDetailTblVar = $this->getCurrentDetailTable();
+		}
+		if ($sDetailTblVar <> "") {
+			$DetailTblVar = explode(",", $sDetailTblVar);
+			if (in_array("federacion", $DetailTblVar)) {
+				if (!isset($GLOBALS["federacion_grid"]))
+					$GLOBALS["federacion_grid"] = new cfederacion_grid;
+				if ($GLOBALS["federacion_grid"]->DetailAdd) {
+					if ($this->CopyRecord)
+						$GLOBALS["federacion_grid"]->CurrentMode = "copy";
+					else
+						$GLOBALS["federacion_grid"]->CurrentMode = "add";
+					$GLOBALS["federacion_grid"]->CurrentAction = "gridadd";
+
+					// Save current master table to detail table
+					$GLOBALS["federacion_grid"]->setCurrentMasterTable($this->TableVar);
+					$GLOBALS["federacion_grid"]->setStartRecordNumber(1);
+					$GLOBALS["federacion_grid"]->idfederacion_tipo->FldIsDetailKey = TRUE;
+					$GLOBALS["federacion_grid"]->idfederacion_tipo->CurrentValue = $this->idfederacion_tipo->CurrentValue;
+					$GLOBALS["federacion_grid"]->idfederacion_tipo->setSessionValue($GLOBALS["federacion_grid"]->idfederacion_tipo->CurrentValue);
+				}
+			}
+		}
 	}
 
 	// Set up Breadcrumb
@@ -904,6 +990,14 @@ $federacion_tipo_add->ShowMessage();
 	</div>
 <?php } ?>
 </div>
+<?php
+	if (in_array("federacion", explode(",", $federacion_tipo->getCurrentDetailTable())) && $federacion->DetailAdd) {
+?>
+<?php if ($federacion_tipo->getCurrentDetailTable() <> "") { ?>
+<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("federacion", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "federaciongrid.php" ?>
+<?php } ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>

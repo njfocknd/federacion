@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql12.php") ?>
 <?php include_once "phpfn12.php" ?>
 <?php include_once "departamentoinfo.php" ?>
-<?php include_once "paisinfo.php" ?>
 <?php include_once "userfn12.php" ?>
 <?php
 
@@ -101,7 +100,7 @@ class cdepartamento_preview extends cdepartamento {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message
@@ -226,9 +225,6 @@ class cdepartamento_preview extends cdepartamento {
 			$GLOBALS["departamento"] = &$this;
 			$GLOBALS["Table"] = &$GLOBALS["departamento"];
 		}
-
-		// Table object (pais)
-		if (!isset($GLOBALS['pais'])) $GLOBALS['pais'] = new cpais();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -464,25 +460,12 @@ class cdepartamento_preview extends cdepartamento {
 	function MasterKeyUrl() {
 		$mastertblvar = @$_GET["t"];
 		$url = "";
-		if ($mastertblvar == "pais") {
-			$url = "" . EW_TABLE_SHOW_MASTER . "=pais&fk_idpais=" . urlencode(strval($this->idpais->QueryStringValue)) . "";
-		}
 		return $url;
 	}
 
 	// Set up foreign keys from filter
 	function SetupForeignKeysFromFilter($f) {
 		$mastertblvar = @$_GET["t"];
-		if ($mastertblvar == "pais") {
-			$find = "`idpais`="; 
-			$x = strpos($f, $find);
-			if ($x !== FALSE) {
-				$x += strlen($find);
-				$val = substr($f, $x);
-				$val = $this->UnquoteValue($val, "DB");
- 				$this->idpais->setQueryStringValue($val);
-			}
-		}
 	}
 
 	// Unquote value

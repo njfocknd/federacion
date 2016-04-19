@@ -101,7 +101,7 @@ class cmunicipio_preview extends cmunicipio {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message

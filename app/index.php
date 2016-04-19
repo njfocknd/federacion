@@ -95,7 +95,7 @@ class cdefault {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message
@@ -258,9 +258,17 @@ class cdefault {
 		if ($Security->IsLoggedIn())
 			$this->Page_Terminate("municipiolist.php");
 		if ($Security->IsLoggedIn())
-			$this->Page_Terminate("organo_tipolist.php");
+			$this->Page_Terminate("federacionlist.php");
 		if ($Security->IsLoggedIn())
-			$this->Page_Terminate("paislist.php");
+			$this->Page_Terminate("organolist.php");
+		if ($Security->IsLoggedIn())
+			$this->Page_Terminate("personalist.php");
+		if ($Security->IsLoggedIn())
+			$this->Page_Terminate("puestolist.php");
+		if ($Security->IsLoggedIn())
+			$this->Page_Terminate("puesto_tipolist.php");
+		if ($Security->IsLoggedIn())
+			$this->Page_Terminate("persona_fotografialist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

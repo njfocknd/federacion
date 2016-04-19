@@ -347,13 +347,6 @@ $departamento_grid->ListOptions->Render("body", "left", $departamento_grid->RowC
 	<?php if ($departamento->idpais->Visible) { // idpais ?>
 		<td data-name="idpais"<?php echo $departamento->idpais->CellAttributes() ?>>
 <?php if ($departamento->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<?php if ($departamento->idpais->getSessionValue() <> "") { ?>
-<span id="el<?php echo $departamento_grid->RowCnt ?>_departamento_idpais" class="form-group departamento_idpais">
-<span<?php echo $departamento->idpais->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $departamento->idpais->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $departamento_grid->RowIndex ?>_idpais" name="x<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo ew_HtmlEncode($departamento->idpais->CurrentValue) ?>">
-<?php } else { ?>
 <span id="el<?php echo $departamento_grid->RowCnt ?>_departamento_idpais" class="form-group departamento_idpais">
 <select data-table="departamento" data-field="x_idpais" data-value-separator="<?php echo ew_HtmlEncode(is_array($departamento->idpais->DisplayValueSeparator) ? json_encode($departamento->idpais->DisplayValueSeparator) : $departamento->idpais->DisplayValueSeparator) ?>" id="x<?php echo $departamento_grid->RowIndex ?>_idpais" name="x<?php echo $departamento_grid->RowIndex ?>_idpais"<?php echo $departamento->idpais->EditAttributes() ?>>
 <?php
@@ -394,17 +387,9 @@ if ($sSqlWrk <> "") $departamento->idpais->LookupFilters["s"] .= $sSqlWrk;
 ?>
 <input type="hidden" name="s_x<?php echo $departamento_grid->RowIndex ?>_idpais" id="s_x<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo $departamento->idpais->LookupFilterQuery() ?>">
 </span>
-<?php } ?>
 <input type="hidden" data-table="departamento" data-field="x_idpais" name="o<?php echo $departamento_grid->RowIndex ?>_idpais" id="o<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo ew_HtmlEncode($departamento->idpais->OldValue) ?>">
 <?php } ?>
 <?php if ($departamento->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($departamento->idpais->getSessionValue() <> "") { ?>
-<span id="el<?php echo $departamento_grid->RowCnt ?>_departamento_idpais" class="form-group departamento_idpais">
-<span<?php echo $departamento->idpais->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $departamento->idpais->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $departamento_grid->RowIndex ?>_idpais" name="x<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo ew_HtmlEncode($departamento->idpais->CurrentValue) ?>">
-<?php } else { ?>
 <span id="el<?php echo $departamento_grid->RowCnt ?>_departamento_idpais" class="form-group departamento_idpais">
 <select data-table="departamento" data-field="x_idpais" data-value-separator="<?php echo ew_HtmlEncode(is_array($departamento->idpais->DisplayValueSeparator) ? json_encode($departamento->idpais->DisplayValueSeparator) : $departamento->idpais->DisplayValueSeparator) ?>" id="x<?php echo $departamento_grid->RowIndex ?>_idpais" name="x<?php echo $departamento_grid->RowIndex ?>_idpais"<?php echo $departamento->idpais->EditAttributes() ?>>
 <?php
@@ -445,7 +430,6 @@ if ($sSqlWrk <> "") $departamento->idpais->LookupFilters["s"] .= $sSqlWrk;
 ?>
 <input type="hidden" name="s_x<?php echo $departamento_grid->RowIndex ?>_idpais" id="s_x<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo $departamento->idpais->LookupFilterQuery() ?>">
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($departamento->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $departamento_grid->RowCnt ?>_departamento_idpais" class="departamento_idpais">
@@ -534,13 +518,6 @@ $departamento_grid->ListOptions->Render("body", "left", $departamento_grid->RowI
 	<?php if ($departamento->idpais->Visible) { // idpais ?>
 		<td data-name="idpais">
 <?php if ($departamento->CurrentAction <> "F") { ?>
-<?php if ($departamento->idpais->getSessionValue() <> "") { ?>
-<span id="el$rowindex$_departamento_idpais" class="form-group departamento_idpais">
-<span<?php echo $departamento->idpais->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $departamento->idpais->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $departamento_grid->RowIndex ?>_idpais" name="x<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo ew_HtmlEncode($departamento->idpais->CurrentValue) ?>">
-<?php } else { ?>
 <span id="el$rowindex$_departamento_idpais" class="form-group departamento_idpais">
 <select data-table="departamento" data-field="x_idpais" data-value-separator="<?php echo ew_HtmlEncode(is_array($departamento->idpais->DisplayValueSeparator) ? json_encode($departamento->idpais->DisplayValueSeparator) : $departamento->idpais->DisplayValueSeparator) ?>" id="x<?php echo $departamento_grid->RowIndex ?>_idpais" name="x<?php echo $departamento_grid->RowIndex ?>_idpais"<?php echo $departamento->idpais->EditAttributes() ?>>
 <?php
@@ -581,7 +558,6 @@ if ($sSqlWrk <> "") $departamento->idpais->LookupFilters["s"] .= $sSqlWrk;
 ?>
 <input type="hidden" name="s_x<?php echo $departamento_grid->RowIndex ?>_idpais" id="s_x<?php echo $departamento_grid->RowIndex ?>_idpais" value="<?php echo $departamento->idpais->LookupFilterQuery() ?>">
 </span>
-<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_departamento_idpais" class="form-group departamento_idpais">
 <span<?php echo $departamento->idpais->ViewAttributes() ?>>

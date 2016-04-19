@@ -101,7 +101,7 @@ class cpais_edit extends cpais {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message

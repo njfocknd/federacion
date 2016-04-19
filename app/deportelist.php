@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql12.php") ?>
 <?php include_once "phpfn12.php" ?>
 <?php include_once "deporteinfo.php" ?>
+<?php include_once "federaciongridcls.php" ?>
 <?php include_once "userfn12.php" ?>
 <?php
 
@@ -140,7 +141,7 @@ class cdeporte_list extends cdeporte {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message
@@ -274,7 +275,7 @@ class cdeporte_list extends cdeporte {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "deporteadd.php";
+		$this->AddUrl = "deporteadd.php?" . EW_TABLE_SHOW_DETAIL . "=";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
@@ -404,6 +405,14 @@ class cdeporte_list extends cdeporte {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
+
+			// Process auto fill for detail table 'federacion'
+			if (@$_POST["grid"] == "ffederaciongrid") {
+				if (!isset($GLOBALS["federacion_grid"])) $GLOBALS["federacion_grid"] = new cfederacion_grid;
+				$GLOBALS["federacion_grid"]->Page_Init();
+				$this->Page_Terminate();
+				exit();
+			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -1013,6 +1022,28 @@ class cdeporte_list extends cdeporte {
 		$item->Visible = $Security->IsLoggedIn();
 		$item->OnLeft = TRUE;
 
+		// "detail_federacion"
+		$item = &$this->ListOptions->Add("detail_federacion");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = $Security->IsLoggedIn() && !$this->ShowMultipleDetails;
+		$item->OnLeft = TRUE;
+		$item->ShowInButtonGroup = FALSE;
+		if (!isset($GLOBALS["federacion_grid"])) $GLOBALS["federacion_grid"] = new cfederacion_grid;
+
+		// Multiple details
+		if ($this->ShowMultipleDetails) {
+			$item = &$this->ListOptions->Add("details");
+			$item->CssStyle = "white-space: nowrap;";
+			$item->Visible = $this->ShowMultipleDetails;
+			$item->OnLeft = TRUE;
+			$item->ShowInButtonGroup = FALSE;
+		}
+
+		// Set up detail pages
+		$pages = new cSubPages();
+		$pages->Add("federacion");
+		$this->DetailPages = $pages;
+
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
 		$item->CssStyle = "white-space: nowrap;";
@@ -1094,6 +1125,57 @@ class cdeporte_list extends cdeporte {
 				$oListOpt->Visible = TRUE;
 			}
 		}
+		$DetailViewTblVar = "";
+		$DetailCopyTblVar = "";
+		$DetailEditTblVar = "";
+
+		// "detail_federacion"
+		$oListOpt = &$this->ListOptions->Items["detail_federacion"];
+		if ($Security->IsLoggedIn()) {
+			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("federacion", "TblCaption");
+			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("federacionlist.php?" . EW_TABLE_SHOW_MASTER . "=deporte&fk_iddeporte=" . urlencode(strval($this->iddeporte->CurrentValue)) . "") . "\">" . $body . "</a>";
+			$links = "";
+			if ($GLOBALS["federacion_grid"]->DetailView && $Security->IsLoggedIn() && $Security->IsLoggedIn()) {
+				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=federacion")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
+				if ($DetailViewTblVar <> "") $DetailViewTblVar .= ",";
+				$DetailViewTblVar .= "federacion";
+			}
+			if ($GLOBALS["federacion_grid"]->DetailEdit && $Security->IsLoggedIn() && $Security->IsLoggedIn()) {
+				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=federacion")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
+				if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
+				$DetailEditTblVar .= "federacion";
+			}
+			if ($links <> "") {
+				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
+				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
+			}
+			$body = "<div class=\"btn-group\">" . $body . "</div>";
+			$oListOpt->Body = $body;
+			if ($this->ShowMultipleDetails) $oListOpt->Visible = FALSE;
+		}
+		if ($this->ShowMultipleDetails) {
+			$body = $Language->Phrase("MultipleMasterDetails");
+			$body = "<div class=\"btn-group\">";
+			$links = "";
+			if ($DetailViewTblVar <> "") {
+				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailViewTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
+			}
+			if ($DetailEditTblVar <> "") {
+				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailEditTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
+			}
+			if ($DetailCopyTblVar <> "") {
+				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailCopyTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
+			}
+			if ($links <> "") {
+				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewMasterDetail\" title=\"" . ew_HtmlTitle($Language->Phrase("MultipleMasterDetails")) . "\" data-toggle=\"dropdown\">" . $Language->Phrase("MultipleMasterDetails") . "<b class=\"caret\"></b></button>";
+				$body .= "<ul class=\"dropdown-menu ewMenu\">". $links . "</ul>";
+			}
+			$body .= "</div>";
+
+			// Multiple details
+			$oListOpt = &$this->ListOptions->Items["details"];
+			$oListOpt->Body = $body;
+		}
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
@@ -1114,6 +1196,33 @@ class cdeporte_list extends cdeporte {
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("AddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddLink")) . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
 		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$option = $options["detail"];
+		$DetailTableLink = "";
+		$item = &$option->Add("detailadd_federacion");
+		$url = $this->GetAddUrl(EW_TABLE_SHOW_DETAIL . "=federacion");
+		$caption = $Language->Phrase("Add") . "&nbsp;" . $this->TableCaption() . "/" . $GLOBALS["federacion"]->TableCaption();
+		$item->Body = "<a class=\"ewDetailAddGroup ewDetailAdd\" title=\"" . ew_HtmlTitle($caption) . "\" data-caption=\"" . ew_HtmlTitle($caption) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . $caption . "</a>";
+		$item->Visible = ($GLOBALS["federacion"]->DetailAdd && $Security->IsLoggedIn() && $Security->IsLoggedIn());
+		if ($item->Visible) {
+			if ($DetailTableLink <> "") $DetailTableLink .= ",";
+			$DetailTableLink .= "federacion";
+		}
+
+		// Add multiple details
+		if ($this->ShowMultipleDetails) {
+			$item = &$option->Add("detailsadd");
+			$url = $this->GetAddUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailTableLink);
+			$item->Body = "<a class=\"ewDetailAddGroup ewDetailAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("AddMasterDetailLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddMasterDetailLink")) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . $Language->Phrase("AddMasterDetailLink") . "</a>";
+			$item->Visible = ($DetailTableLink <> "" && $Security->IsLoggedIn());
+
+			// Hide single master/detail items
+			$ar = explode(",", $DetailTableLink);
+			$cnt = count($ar);
+			for ($i = 0; $i < $cnt; $i++) {
+				if ($item = &$option->GetItem("detailadd_" . $ar[$i]))
+					$item->Visible = FALSE;
+			}
+		}
 		$option = $options["action"];
 
 		// Set up options default
@@ -1296,6 +1405,63 @@ class cdeporte_list extends cdeporte {
 
 	function RenderListOptionsExt() {
 		global $Security, $Language;
+		$links = "";
+		$btngrps = "";
+		$sSqlWrk = "`iddeporte`=" . ew_AdjustSql($this->iddeporte->CurrentValue, $this->DBID) . "";
+
+		// Column "detail_federacion"
+		if ($this->DetailPages->Items["federacion"]->Visible) {
+			$link = "";
+			$option = &$this->ListOptions->Items["detail_federacion"];
+			$url = "federacionpreview.php?t=deporte&f=" . ew_Encrypt($sSqlWrk);
+			$btngrp = "<div data-table=\"federacion\" data-url=\"" . $url . "\" class=\"btn-group\">";
+			if ($Security->IsLoggedIn()) {			
+				$label = $Language->TablePhrase("federacion", "TblCaption");
+				$link = "<li><a href=\"#\" data-toggle=\"tab\" data-table=\"federacion\" data-url=\"" . $url . "\">" . $label . "</a></li>";			
+				$links .= $link;
+				$detaillnk = ew_JsEncode3("federacionlist.php?" . EW_TABLE_SHOW_MASTER . "=deporte&fk_iddeporte=" . urlencode(strval($this->iddeporte->CurrentValue)) . "");
+				$btngrp .= "<button type=\"button\" class=\"btn btn-default btn-sm\" title=\"" . $Language->TablePhrase("federacion", "TblCaption") . "\" onclick=\"window.location='" . $detaillnk . "'\">" . $Language->Phrase("MasterDetailListLink") . "</button>";
+			}
+			if ($GLOBALS["federacion_grid"]->DetailView && $Security->IsLoggedIn() && $Security->IsLoggedIn())
+				$btngrp .= "<button type=\"button\" class=\"btn btn-default btn-sm\" title=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" onclick=\"window.location='" . $this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=federacion") . "'\">" . $Language->Phrase("MasterDetailViewLink") . "</button>";
+			if ($GLOBALS["federacion_grid"]->DetailEdit && $Security->IsLoggedIn() && $Security->IsLoggedIn())
+				$btngrp .= "<button type=\"button\" class=\"btn btn-default btn-sm\" title=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" onclick=\"window.location='" . $this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=federacion") . "'\">" . $Language->Phrase("MasterDetailEditLink") . "</button>";
+			$btngrp .= "</div>";
+			if ($link <> "") {
+				$btngrps .= $btngrp;
+				$option->Body .= "<div class=\"hide ewPreview\">" . $link . $btngrp . "</div>";
+			}
+		}
+
+		// Hide detail items if necessary
+		$this->ListOptions->HideDetailItemsForDropDown();
+
+		// Column "preview"
+		$option = &$this->ListOptions->GetItem("preview");
+		if (!$option) { // Add preview column
+			$option = &$this->ListOptions->Add("preview");
+			$option->OnLeft = TRUE;
+			if ($option->OnLeft) {
+				$option->MoveTo($this->ListOptions->ItemPos("checkbox") + 1);
+			} else {
+				$option->MoveTo($this->ListOptions->ItemPos("checkbox"));
+			}
+			$option->Visible = !($this->Export <> "" || $this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit");
+			$option->ShowInDropDown = FALSE;
+			$option->ShowInButtonGroup = FALSE;
+		}
+		if ($option) {
+			$option->Body = "<span class=\"ewPreviewRowBtn icon-expand\"></span>";
+			$option->Body .= "<div class=\"hide ewPreview\">" . $links . $btngrps . "</div>";
+			if ($option->Visible) $option->Visible = $links <> "";
+		}
+
+		// Column "details" (Multiple details)
+		$option = &$this->ListOptions->GetItem("details");
+		if ($option) {
+			$option->Body .= "<div class=\"hide ewPreview\">" . $links . $btngrps . "</div>";
+			if ($option->Visible) $option->Visible = $links <> "";
+		}
 	}
 
 	// Set up starting record parameters

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ew-language date="2016/4/14" version="12.0.0" id="es" name="Spanish" desc="Español" author="KK.pupu Damus">
+<ew-language date="2016/4/18" version="12.0.0" id="es" name="Spanish" desc="Español" author="KK.pupu Damus">
 	<locale>
 		<phrase id="locale" value=""/>
 		<!-- *** system locale for this language -->
@@ -593,13 +593,19 @@
 	</global>
 	<project><phrase id="bodytitle" value="Federación"/>
 <phrase id="footertext" value="Nexthor Software Company"/>
+<menu id="14"><phrase id="menutext" value="persona fotografia"/>
+</menu>
+<menu id="9"><phrase id="menutext" value="Federación"/>
+</menu>
+<menu id="11"><phrase id="menutext" value="Persona"/>
+</menu>
 <menu id="7"><phrase id="menutext" value="audittrail"/>
 </menu>
 <menu id="8"><phrase id="menutext" value="Catálogo"/>
 </menu>
 <menu id="3"><phrase id="menutext" value="Tipo de Federación"/>
 </menu>
-<menu id="5"><phrase id="menutext" value="Tipo de Órgano"/>
+<menu id="10"><phrase id="menutext" value="Organo"/>
 </menu>
 <menu id="2"><phrase id="menutext" value="Deporte"/>
 </menu>
@@ -608,6 +614,10 @@
 <menu id="1"><phrase id="menutext" value="Departamento"/>
 </menu>
 <menu id="4"><phrase id="menutext" value="Municipio"/>
+</menu>
+<menu id="12"><phrase id="menutext" value="Puesto"/>
+</menu>
+<menu id="13"><phrase id="menutext" value="Tipos de Puesto"/>
 </menu>
 <table id="departamento"><phrase id="tblcaption" value="Departamento"/>
 <field id="iddepartamento"><phrase id="fldcaption" value="ID Departamento"/>
@@ -679,22 +689,6 @@
 <field id="fecha_insercion"><phrase id="fldcaption" value="Fecha de Inserción"/>
 </field>
 </table>
-<table id="organo_tipo"><phrase id="tblcaption" value="Tipo de Órgano"/>
-<field id="idorgano_tipo"><phrase id="fldcaption" value="ID Tipo de Órgano"/>
-</field>
-<field id="nombre"><phrase id="fldcaption" value="Nombre"/>
-</field>
-<field id="siglas"><phrase id="fldcaption" value="Siglas"/>
-</field>
-<field id="estado"><phrase id="fldcaption" value="Estado"/>
-<phrase id="fldtagvalue1" value="Activo"/>
-<phrase id="fldtagcaption1" value="Activo"/>
-<phrase id="fldtagvalue2" value="Inactivo"/>
-<phrase id="fldtagcaption2" value="Inactivo"/>
-</field>
-<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha de Inserción"/>
-</field>
-</table>
 <table id="pais"><phrase id="tblcaption" value="País"/>
 <field id="idpais"><phrase id="fldcaption" value="ID País"/>
 </field>
@@ -735,6 +729,126 @@
 <field id="oldvalue"><phrase id="fldcaption" value="oldvalue"/>
 </field>
 <field id="newvalue"><phrase id="fldcaption" value="newvalue"/>
+</field>
+</table>
+<table id="federacion"><phrase id="tblcaption" value="Federación"/>
+<field id="idfederacion"><phrase id="fldcaption" value="ID Federación"/>
+</field>
+<field id="nombre"><phrase id="fldcaption" value="Nombre"/>
+</field>
+<field id="nomenclatura"><phrase id="fldcaption" value="Nomenclatura"/>
+</field>
+<field id="idfederacion_tipo"><phrase id="fldcaption" value="Tipo de Federación"/>
+</field>
+<field id="iddeporte"><phrase id="fldcaption" value="Deporte"/>
+</field>
+<field id="estado"><phrase id="fldcaption" value="Estado"/>
+<phrase id="fldtagvalue1" value="Activo"/>
+<phrase id="fldtagcaption1" value="Activo"/>
+<phrase id="fldtagvalue2" value="Inactivo"/>
+<phrase id="fldtagcaption2" value="Inactivo"/>
+</field>
+<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha de Inserción"/>
+</field>
+</table>
+<table id="organo"><phrase id="tblcaption" value="Organo Discipinario"/>
+<field id="idorgano"><phrase id="fldcaption" value="ID Organo Disciplinario"/>
+</field>
+<field id="nombre"><phrase id="fldcaption" value="Nombre"/>
+</field>
+<field id="siglas"><phrase id="fldcaption" value="Siglas"/>
+</field>
+<field id="estado"><phrase id="fldcaption" value="Estado"/>
+<phrase id="fldtagvalue1" value="Activo"/>
+<phrase id="fldtagcaption1" value="Activo"/>
+<phrase id="fldtagvalue2" value="Inactivo"/>
+<phrase id="fldtagcaption2" value="Inactivo"/>
+</field>
+<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha Inserción"/>
+</field>
+</table>
+<table id="persona"><phrase id="tblcaption" value="Persona"/>
+<field id="idpersona"><phrase id="fldcaption" value="ID Persona"/>
+</field>
+<field id="cui"><phrase id="fldcaption" value="CUI"/>
+</field>
+<field id="nombre"><phrase id="fldcaption" value="Nombres"/>
+</field>
+<field id="apellido"><phrase id="fldcaption" value="Apellidos"/>
+</field>
+<field id="direccion"><phrase id="fldcaption" value="Dirección"/>
+</field>
+<field id="telefonos"><phrase id="fldcaption" value="Telefono(s)"/>
+</field>
+<field id="estado"><phrase id="fldcaption" value="Estado"/>
+<phrase id="fldtagvalue1" value="Activo"/>
+<phrase id="fldtagcaption1" value="Activo"/>
+<phrase id="fldtagvalue2" value="Inactivo"/>
+<phrase id="fldtagcaption2" value="Inactivo"/>
+</field>
+<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha Inserción"/>
+</field>
+<field id="fotografia"><phrase id="fldcaption" value="Fotografía"/>
+</field>
+</table>
+<table id="puesto"><phrase id="tblcaption" value="Puesto"/>
+<field id="idpuesto"><phrase id="fldcaption" value="ID Puesto"/>
+</field>
+<field id="idpuesto_tipo"><phrase id="fldcaption" value="Tipo de Puesto"/>
+</field>
+<field id="idpersona"><phrase id="fldcaption" value="Persona"/>
+</field>
+<field id="idfederacion"><phrase id="fldcaption" value="Federación"/>
+</field>
+<field id="idorgano"><phrase id="fldcaption" value="Organo"/>
+</field>
+<field id="fecha_inicio"><phrase id="fldcaption" value="Fecha Inicio"/>
+</field>
+<field id="fecha_fin"><phrase id="fldcaption" value="Fecha Fin"/>
+</field>
+<field id="status"><phrase id="fldcaption" value="Estatus"/>
+<phrase id="fldtagvalue1" value="Electo"/>
+<phrase id="fldtagcaption1" value="Electo"/>
+<phrase id="fldtagvalue2" value="Ejerciendo"/>
+<phrase id="fldtagcaption2" value="Ejerciendo"/>
+</field>
+<field id="estado"><phrase id="fldcaption" value="Estado"/>
+<phrase id="fldtagvalue1" value="Activo"/>
+<phrase id="fldtagcaption1" value="Activo"/>
+<phrase id="fldtagvalue2" value="Inactivo"/>
+<phrase id="fldtagcaption2" value="Inactivo"/>
+</field>
+<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha Inserción"/>
+</field>
+</table>
+<table id="puesto_tipo"><phrase id="tblcaption" value="Tipo de Puesto"/>
+<field id="idpuesto_tipo"><phrase id="fldcaption" value="ID Tipo de Puesto"/>
+</field>
+<field id="nombre"><phrase id="fldcaption" value="Nombre"/>
+</field>
+<field id="estado"><phrase id="fldcaption" value="Estado"/>
+<phrase id="fldtagvalue1" value="Activo"/>
+<phrase id="fldtagcaption1" value="Activo"/>
+<phrase id="fldtagvalue2" value="Inactivo"/>
+<phrase id="fldtagcaption2" value="Inactivo"/>
+</field>
+<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha Inserción"/>
+</field>
+</table>
+<table id="persona_fotografia"><phrase id="tblcaption" value="Fotografía de Persona"/>
+<field id="idpersona_fotografia"><phrase id="fldcaption" value="ID Fotografía de Persona"/>
+</field>
+<field id="idpersona"><phrase id="fldcaption" value="Persona"/>
+</field>
+<field id="fotografia"><phrase id="fldcaption" value="Fotografía"/>
+</field>
+<field id="fecha_insercion"><phrase id="fldcaption" value="Fecha de Inserción"/>
+</field>
+<field id="estado"><phrase id="fldcaption" value="Estado"/>
+<phrase id="fldtagvalue1" value="Activo"/>
+<phrase id="fldtagcaption1" value="Activo"/>
+<phrase id="fldtagvalue2" value="Inactivo"/>
+<phrase id="fldtagcaption2" value="Inactivo"/>
 </field>
 </table>
 </project>

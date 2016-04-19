@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql12.php") ?>
 <?php include_once "phpfn12.php" ?>
 <?php include_once "departamentoinfo.php" ?>
-<?php include_once "paisinfo.php" ?>
 <?php include_once "municipiogridcls.php" ?>
 <?php include_once "userfn12.php" ?>
 <?php
@@ -102,7 +101,7 @@ class cdepartamento_add extends cdepartamento {
 
 	// Show message
 	function ShowMessage() {
-		$hidden = FALSE;
+		$hidden = TRUE;
 		$html = "";
 
 		// Message
@@ -227,9 +226,6 @@ class cdepartamento_add extends cdepartamento {
 			$GLOBALS["departamento"] = &$this;
 			$GLOBALS["Table"] = &$GLOBALS["departamento"];
 		}
-
-		// Table object (pais)
-		if (!isset($GLOBALS['pais'])) $GLOBALS['pais'] = new cpais();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -363,9 +359,6 @@ class cdepartamento_add extends cdepartamento {
 	//
 	function Page_Main() {
 		global $objForm, $Language, $gsFormError;
-
-		// Set up master/detail parameters
-		$this->SetUpMasterParms();
 
 		// Process form if post back
 		if (@$_POST["a_add"] <> "") {
@@ -667,32 +660,6 @@ class cdepartamento_add extends cdepartamento {
 			// idpais
 			$this->idpais->EditAttrs["class"] = "form-control";
 			$this->idpais->EditCustomAttributes = "";
-			if ($this->idpais->getSessionValue() <> "") {
-				$this->idpais->CurrentValue = $this->idpais->getSessionValue();
-			if (strval($this->idpais->CurrentValue) <> "") {
-				$sFilterWrk = "`idpais`" . ew_SearchString("=", $this->idpais->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `idpais`, `nombre` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pais`";
-			$sWhereWrk = "";
-			$lookuptblfilter = "`estado` = 'Activo'";
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->idpais, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$sSqlWrk .= " ORDER BY `idpais`";
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->idpais->ViewValue = $this->idpais->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->idpais->ViewValue = $this->idpais->CurrentValue;
-				}
-			} else {
-				$this->idpais->ViewValue = NULL;
-			}
-			$this->idpais->ViewCustomAttributes = "";
-			} else {
 			if (trim(strval($this->idpais->CurrentValue)) == "") {
 				$sFilterWrk = "0=1";
 			} else {
@@ -711,7 +678,6 @@ class cdepartamento_add extends cdepartamento {
 			if ($rswrk) $rswrk->Close();
 			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
 			$this->idpais->EditValue = $arwrk;
-			}
 
 			// Add refer script
 			// nombre
@@ -845,66 +811,6 @@ class cdepartamento_add extends cdepartamento {
 			$this->Row_Inserted($rs, $rsnew);
 		}
 		return $AddRow;
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-		$bValidMaster = FALSE;
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "pais") {
-				$bValidMaster = TRUE;
-				if (@$_GET["fk_idpais"] <> "") {
-					$GLOBALS["pais"]->idpais->setQueryStringValue($_GET["fk_idpais"]);
-					$this->idpais->setQueryStringValue($GLOBALS["pais"]->idpais->QueryStringValue);
-					$this->idpais->setSessionValue($this->idpais->QueryStringValue);
-					if (!is_numeric($GLOBALS["pais"]->idpais->QueryStringValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "pais") {
-				$bValidMaster = TRUE;
-				if (@$_POST["fk_idpais"] <> "") {
-					$GLOBALS["pais"]->idpais->setFormValue($_POST["fk_idpais"]);
-					$this->idpais->setFormValue($GLOBALS["pais"]->idpais->FormValue);
-					$this->idpais->setSessionValue($this->idpais->FormValue);
-					if (!is_numeric($GLOBALS["pais"]->idpais->FormValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		}
-		if ($bValidMaster) {
-
-			// Save current master table
-			$this->setCurrentMasterTable($sMasterTblVar);
-
-			// Reset start record counter (new master key)
-			$this->StartRec = 1;
-			$this->setStartRecordNumber($this->StartRec);
-
-			// Clear previous master key from Session
-			if ($sMasterTblVar <> "pais") {
-				if ($this->idpais->CurrentValue == "") $this->idpais->setSessionValue("");
-			}
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
 	}
 
 	// Set up detail parms based on QueryString
@@ -1114,10 +1020,6 @@ $departamento_add->ShowMessage();
 <?php } ?>
 <input type="hidden" name="t" value="departamento">
 <input type="hidden" name="a_add" id="a_add" value="A">
-<?php if ($departamento->getCurrentMasterTable() == "pais") { ?>
-<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="pais">
-<input type="hidden" name="fk_idpais" value="<?php echo $departamento->idpais->getSessionValue() ?>">
-<?php } ?>
 <div>
 <?php if ($departamento->nombre->Visible) { // nombre ?>
 	<div id="r_nombre" class="form-group">
@@ -1143,13 +1045,6 @@ $departamento_add->ShowMessage();
 	<div id="r_idpais" class="form-group">
 		<label id="elh_departamento_idpais" for="x_idpais" class="col-sm-2 control-label ewLabel"><?php echo $departamento->idpais->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $departamento->idpais->CellAttributes() ?>>
-<?php if ($departamento->idpais->getSessionValue() <> "") { ?>
-<span id="el_departamento_idpais">
-<span<?php echo $departamento->idpais->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $departamento->idpais->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x_idpais" name="x_idpais" value="<?php echo ew_HtmlEncode($departamento->idpais->CurrentValue) ?>">
-<?php } else { ?>
 <span id="el_departamento_idpais">
 <select data-table="departamento" data-field="x_idpais" data-value-separator="<?php echo ew_HtmlEncode(is_array($departamento->idpais->DisplayValueSeparator) ? json_encode($departamento->idpais->DisplayValueSeparator) : $departamento->idpais->DisplayValueSeparator) ?>" id="x_idpais" name="x_idpais"<?php echo $departamento->idpais->EditAttributes() ?>>
 <?php
@@ -1189,7 +1084,6 @@ if ($sSqlWrk <> "") $departamento->idpais->LookupFilters["s"] .= $sSqlWrk;
 ?>
 <input type="hidden" name="s_x_idpais" id="s_x_idpais" value="<?php echo $departamento->idpais->LookupFilterQuery() ?>">
 </span>
-<?php } ?>
 <?php echo $departamento->idpais->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
